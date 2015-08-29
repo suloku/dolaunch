@@ -1,0 +1,70 @@
+# Specify a path under each button. Example:
+#	#A
+#	A=fat:/autoboot/swiss.dol
+#
+# Instead of showing the path, launcher can show a specified text string:
+#	A_TITLE=Whatever I want to be shown on screen
+#
+# Remember the paths are case sensitive.
+
+
+#Image: path to image to be shown in background. Must be PNG 640x480
+IMAGE=fat:/autoboot/autoback.png
+
+#Print: 0 will print text to screen, 1 won't print. Useful if you only want an image.
+NOPRINT=0
+
+#Timer: -1 is disabled, any other values are seconds until default boot
+TIMER=-1
+
+#Default: this will boot after (timer) seconds or when the corresponding dol for a button can't be opened (i.e. there's none in the sd card).
+DEFAULT=fat:/autoexec.dol
+DEF_TITLE=
+
+#A
+A=fat:/autoboot/autoexecA.dol
+A_TITLE=
+
+#B
+B=fat:/autoboot/autoexecB.dol
+B_TITLE=
+
+#Y
+Y=fat:/autoboot/autoexecY.dol
+Y_TITLE=
+
+#X
+X=fat:/autoboot/autoexecX.dol
+X_TITLE=
+
+#Dpad Left
+L=fat:/autoboot/autoexecL.dol
+L_TITLE=
+
+#Dpad Right
+R=fat:/autoboot/autoexecR.dol
+R_TITLE=
+
+#Dpad Down
+D=fat:/autoboot/autoexecD.dol
+D_TITLE=
+
+#Dpad Up
+U=fat:/autoboot/autoexecU.dol
+U_TITLE=
+
+#Z trigger
+ZT=fat:/autoboot/autoexecZT.dol
+ZT_TITLE=
+
+#L trigger
+LT=fat:/autoboot/autoexecLT.dol
+LT_TITLE=
+
+#R trigger
+RT=fat:/autoboot/autoexecRT.dol
+RT_TITLE=
+
+#Start
+S=fat:/autoboot/autoexecS.dol
+S_TITLE=
