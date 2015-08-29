@@ -1,7 +1,9 @@
 brosexec/build/
+brosexec/actionreplay/SDLOADER.BIN
 brosexecconf/build/
 brosexecconf/background/
 mcloader/build/
+release/
 
 
 *.dol

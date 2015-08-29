@@ -346,8 +346,9 @@ VIDEO_ClearFrameBuffer (rmode, xfb, COLOR_BLACK);
 	IMGCTX ctx;
 
 	#ifndef TESTDOLPHIN
+		
 		if ( !(ctx = PNGU_SelectImageFromDevice (image)) ){
-			myprintf ("PNGU_SelectFileFromDevice failed!\n");
+			if (strlen(image)>0) myprintf ("PNGU_SelectFileFromDevice failed!\n");
 		}
 	#else
 		if ( !(ctx = PNGU_SelectImageFromBuffer (bckgrnd)) ){

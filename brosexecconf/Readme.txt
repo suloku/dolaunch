@@ -23,7 +23,7 @@ sdgecko:/autoboot/autoconf.txt: configuration file, up to 12 buttons can be conf
 
 Timer value: seconds until program boots default dol. If there is no default dol specified in the config file, sdgecko:/autoexec.dol will be launched. Can be disabled with value -1.
 
-Image path:
+Image (only back version): background image should be a 640x480 png file for propper display.
 
 
 Some considerations:
