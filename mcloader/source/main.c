@@ -7,6 +7,8 @@
 #include <time.h>
 #include "aram/sidestep.h"
 
+#define CLIMAGIC "CL@MAG"
+
 /*** Memory File Buffer ***/
 //#define MAXFILEBUFFER (1024 * 2048)     /*** 2MB Buffer ***/
 //u8 dolbuffer[MAXFILEBUFFER] ATTRIBUTE_ALIGN (32);
@@ -26,7 +28,6 @@ u32 first_frame = 1;
 GXRModeObj *rmode;
 void (*PSOreload)() = (void(*)())0x80001800;
 
-
 void waitA(){
 	printf("Press A to continue\n");
 	while (1){
@@ -39,6 +40,35 @@ void waitA(){
 		}
 		VIDEO_WaitVSync();
 	}
+}
+
+u8* cli_buffer;
+int cli_size;
+
+void getclifrombuffer(u8* gcibuffer, int gcisize){
+    //test code for retrieving CLI from gci buffer
+    char *magic = CLIMAGIC;
+    int offset = 0;
+    if (memcmp (gcibuffer-strlen(magic), magic, strlen(magic))){
+        printf ("Magic found\n");
+        for(offset = 0; offset < gcisize; offset++){
+            if (memcmp(&gcibuffer[offset], magic, strlen(magic)) == 0 ){
+                printf("Found first magic at %d\n", offset);
+                cli_size = gcisize-offset-strlen(magic)*2;
+                printf("Cli size = %d\n", cli_size);
+                break;
+            }
+        }
+
+        if (!(offset >= gcisize)){
+            cli_buffer = (char *) malloc (sizeof(char)*cli_size+1); //+1 to be able to append terminating null character later
+            memcpy (cli_buffer, gcibuffer+offset+strlen(magic), cli_size );
+        }else{
+            printf("No embeded cli found\n");
+            cli_size = 0;
+            cli_buffer = NULL;
+        }
+    }
 }
 
 /*---------------------------------------------------------------------------------
@@ -127,7 +157,7 @@ int main() {
 		tomenu=0;
 		pressed = 0;
 		printf("\x1b[2;0H");
-		printf("Memory Card Loader 0.1 by Suloku\n");
+		printf("Memory Card Loader 0.2 by Suloku\n");
 		printf("********************************\n\n");
 		printf("Press A or B button to select a slot.\n");
 		while (1){
@@ -243,8 +273,48 @@ int main() {
 								}
 								CARD_Close(&CardFile);
 								CARD_Unmount(slot);
-								//boot dol
-								DOLtoARAM(dolbuffer, 0, NULL);
+							//boot dol
+								//This will load cli_buffer and cli_size
+								getclifrombuffer(dolbuffer, filesize);
+								if (cli_buffer!=NULL){
+									// Build a command line to pass to the DOL
+									int argc2 = 0;
+									char *argv2[1024];
+									//add a terminating null character for last argument if needed
+									if (cli_buffer[cli_size-1] != '\0'){
+										cli_buffer[cli_size] = '\0';
+										cli_size += 1;
+									}
+
+									// CLI parse
+									char bootpath[CARD_FILENAMELEN+10];
+									sprintf(bootpath, "mc%d:/%s", slot, (char*)&CardList[listpos].filename);
+									argv2[argc2] = bootpath;
+									argc2++;
+									// First argument is at the beginning of the file
+									if(cli_buffer[0] != '\r' && cli_buffer[0] != '\n') {
+										argv2[argc2] = cli_buffer;
+										argc2++;
+									}
+									// Search for the others after each newline
+									int i;
+									for(i = 0; i < cli_size; i++) {
+										if(cli_buffer[i] == '\r' || cli_buffer[i] == '\n') {
+											cli_buffer[i] = '\0';
+										}
+										else if(cli_buffer[i - 1] == '\0') {
+											argv2[argc2] = cli_buffer + i;
+											argc2++;
+
+											if(argc2 >= 1024)
+												break;
+										}
+									}
+									DOLtoARAM(dolbuffer, argc2, argc2 == 0 ? NULL : argv2);
+								}else{
+									DOLtoARAM(dolbuffer, 0, NULL);
+								}
+
 								//If we get here dol was invalid
 								if(dolbuffer != NULL) free(dolbuffer);
 								printf("Not a valid dol file.\n");
