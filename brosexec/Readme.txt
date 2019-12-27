@@ -1,3 +1,8 @@
+SD2SP2 support added by NiHuShu
+This version of Brosexec is designed to work only with SD2SP2 adapter, it won't work with SD GECKO in SLOT A or B.
+It might not be the best solution but it works for me.
+
+Original Readme.txt:
 Brosexec 0.1 by suloku '15
 **************************
 
