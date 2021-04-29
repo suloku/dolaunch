@@ -10,6 +10,7 @@
 static int initFAT(){
 
 	int slotagecko = 0;
+	int slotbgecko = 0;
 	int i =0;
 	s32 ret, memsize, sectsize;
 
@@ -17,9 +18,23 @@ static int initFAT(){
 	for(i=0;i<10;i++){
 		ret = CARD_ProbeEx(CARD_SLOTA, &memsize, &sectsize);
 		//printf("Ret: %d", ret);
-		if (ret == CARD_ERROR_WRONGDEVICE){
+		if (ret == CARD_ERROR_WRONGDEVICE)
+		{
 			slotagecko = 1;
 			break;
+		}
+	}
+	
+	if(slotagecko == 0)
+	{
+		for(i=0;i<10;i++){
+		ret = CARD_ProbeEx(CARD_SLOTB, &memsize, &sectsize);
+		//printf("Ret: %d", ret);
+			if (ret == CARD_ERROR_WRONGDEVICE)
+			{
+				slotbgecko = 1;
+				break;
+			}
 		}
 	}
 
@@ -43,7 +58,7 @@ static int initFAT(){
 			//printf("Error Mounting SD fat! Using embedded config.\n\n");
 			return 0;
 		}
-	}else //Memcard in SLOT A, SD gecko in SLOT B
+	}else if (slotbgecko)//Memcard in SLOT A, SD gecko in SLOT B
 	{
 		//This will ensure SD gecko is recognized if inserted or changed to another slot after GCMM is executed
 		for(i=0;i<10;i++){
@@ -62,9 +77,22 @@ static int initFAT(){
 			//printf("Error Mounting SD fat! Using default config.\n\n");
 			return 0;
 		}
+	}else
+	{
+		//Memcard in slot A or B, SD2SP2 in Serial Port 2
+		__io_gcsd2.startup();
+		if (!__io_gcsd2.isInserted())
+		{
+			//printf ("No SD2SP2 inserted! Using embedded config.\n\n");
+			return 0;
+		}
+		if (!fatMountSimple ("fat", &__io_gcsd2))
+		{
+			//printf("Error Mounting SD fat! Using embedded config.\n\n");
+			return 0;
+		}
 	}
-
-	return 1;
+		return 1;
 }
 
 int main(int argc, char *argv[])

@@ -1,3 +1,6 @@
+SD2SP2 support added by NiHuShu
+It might take a while for it to load because it checks for both memcard slots.
+Original Readme.txt:
 Brosexec 0.1 by suloku '15
 **************************
 
